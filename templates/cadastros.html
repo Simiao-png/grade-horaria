@@ -105,6 +105,16 @@
                                         <button type="button" class="btn btn-sm btn-outline-primary matriz-controle-botao" data-acao="aumentar" data-disciplina-id="{{ disciplina.id }}" disabled aria-label="Aumentar aulas de {{ disciplina.nome }}">
                                             <i class="bi bi-plus-lg"></i>
                                         </button>
+
+                                        <button type="button"
+                                                class="btn btn-sm btn-outline-danger"
+                                                title="Excluir disciplina"
+                                                aria-label="Excluir disciplina {{ disciplina.nome }}"
+                                                data-disciplina-id="{{ disciplina.id }}"
+                                                data-disciplina-nome="{{ disciplina.nome|e }}"
+                                                onclick="deletarDisciplinaMatriz(this)">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
                                     </div>
                                 </div>
                             </div>
@@ -959,6 +969,48 @@
             modalDisciplina = new bootstrap.Modal(document.getElementById("modalDisciplina"));
         }
         modalDisciplina.show();
+    };
+
+
+    window.deletarDisciplinaMatriz = async function (botao) {
+        const disciplinaId = botao?.dataset?.disciplinaId;
+        const nome = botao?.dataset?.disciplinaNome || "esta disciplina";
+
+        if (!disciplinaId) {
+            window.alert("Não foi possível identificar a disciplina.");
+            return;
+        }
+
+        const confirmou = window.confirm(
+            `Excluir a disciplina "${nome}"? Esta ação não poderá ser desfeita.`
+        );
+
+        if (!confirmou) return;
+
+        const estavaDesabilitado = botao.disabled;
+        botao.disabled = true;
+
+        try {
+            const resposta = await fetch(
+                `/disciplinas/${disciplinaId}`,
+                { method: "DELETE" }
+            );
+
+            const dados = await resposta.json().catch(() => ({}));
+
+            if (!resposta.ok) {
+                throw new Error(
+                    dados.erro || "Não foi possível excluir a disciplina."
+                );
+            }
+
+            const url = new URL(window.location.href);
+            url.searchParams.set("aba", "disciplinas");
+            window.location.href = url.toString();
+        } catch (erro) {
+            window.alert(erro.message);
+            botao.disabled = estavaDesabilitado;
+        }
     };
 
     document.addEventListener("DOMContentLoaded", function () {

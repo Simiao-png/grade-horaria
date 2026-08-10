@@ -40,7 +40,10 @@ def criar():
 
 @disciplina_bp.route("/disciplinas/<int:id>", methods=["PUT"])
 def atualizar(id):
-    return atualizar_disciplina(id, request.get_json())
+    return atualizar_disciplina(
+        id,
+        request.get_json()
+    )
 
 
 @disciplina_bp.route("/disciplinas/<int:id>", methods=["DELETE"])
@@ -48,6 +51,9 @@ def deletar(id):
     return deletar_disciplina(id)
 
 
-@disciplina_bp.route("/disciplinas/<int:id>/status", methods=["PATCH"])
+@disciplina_bp.route(
+    "/disciplinas/<int:id>/status",
+    methods=["PATCH"]
+)
 def alternar_status(id):
     return alternar_status_disciplina(id)
